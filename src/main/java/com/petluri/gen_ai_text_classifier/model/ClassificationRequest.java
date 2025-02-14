@@ -11,6 +11,9 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class ClassificationRequest {
 
+    private String genAIType;
+    private String genAIModel;
+    private String genAIAPIKey;
     private List<String> textToClassifyList;
     private List<String> attributeList;
 }

@@ -32,7 +32,7 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
     @Override
     public List<Classification> classify(ClassificationRequest classificationRequest) {
 
-        String response = getResponse(getHeaders(), getRequestBody(getPrompt(classificationRequest)));
+        String response = getResponse(getHeaders(classificationRequest), getRequestBody(getPrompt(classificationRequest), classificationRequest));
 
         System.out.println("Response: " + response);
         
@@ -69,9 +69,9 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
         return jsonResponse.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
     }
 
-    private JSONObject getRequestBody(String prompt) throws JSONException {
+    private JSONObject getRequestBody(String prompt, ClassificationRequest classificationRequest) throws JSONException {
         JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "gpt-4o-mini");
+        requestBody.put("model", classificationRequest.getGenAIModel());
         System.out.println("Prompt: " + prompt);
         requestBody.put("messages", Collections.singletonList(
             new JSONObject().put("role", "user").put("content", prompt)
@@ -80,10 +80,10 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
         return requestBody;
     }
 
-    private HttpHeaders getHeaders() {
+    private HttpHeaders getHeaders(ClassificationRequest classificationRequest) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(genAIServicesConfig.getChatGPTApiKey());
+        headers.setBearerAuth(classificationRequest.getGenAIAPIKey());
         return headers;
     }
     

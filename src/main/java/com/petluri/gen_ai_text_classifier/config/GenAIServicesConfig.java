@@ -11,7 +11,4 @@ public class GenAIServicesConfig {
 
     @Value("${chatgpt.url}")
     private String chatGPTUrl;
-
-    @Value("${chatgpt.api.key}")
-    private String chatGPTApiKey;
 }
