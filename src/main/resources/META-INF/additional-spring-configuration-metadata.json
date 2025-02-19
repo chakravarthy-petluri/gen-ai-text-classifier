@@ -3,5 +3,15 @@
     "name": "chatgpt.url",
     "type": "java.lang.String",
     "description": "A description for 'chatgpt.url'"
+  },
+  {
+    "name": "gemini.url",
+    "type": "java.lang.String",
+    "description": "A description for 'gemini.url'"
+  },
+  {
+    "name": "base.prompt",
+    "type": "java.lang.String",
+    "description": "A description for 'prompt'"
   }
 ]}
