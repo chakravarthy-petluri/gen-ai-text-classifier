@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,7 +19,11 @@ import com.petluri.gen_ai_text_classifier.model.Classification;
 import com.petluri.gen_ai_text_classifier.model.ClassificationRequest;
 import com.petluri.gen_ai_text_classifier.service.ClassificationService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
+@Qualifier("classificationServiceUsingChatGPTConfig")
 public class ClassificationServiceUsingChatGPT implements ClassificationService {
 
     private final GenAIServicesConfig genAIServicesConfig;
