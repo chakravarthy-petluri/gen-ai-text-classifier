@@ -5,7 +5,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +32,9 @@ public class ClassificationServiceUsingGemini implements ClassificationService {
     private final GenAIServicesConfig genAIServicesConfig;
     private final RestTemplate restTemplate;
     private final GeminiResponseParser geminiResponseParser;
+
+    @Autowired
+    private Environment environment;
 
     public ClassificationServiceUsingGemini(GenAIServicesConfig genAIServicesConfig) {
         this.genAIServicesConfig = genAIServicesConfig;
@@ -72,7 +77,7 @@ public class ClassificationServiceUsingGemini implements ClassificationService {
 
     private String getResponse(ClassificationRequest classificationRequest, HttpHeaders headers, JSONObject requestBody) {
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
-        String URL = genAIServicesConfig.getGeminiUrl()+classificationRequest.getGenAIModel()+":generateContent?key="+classificationRequest.getGenAIAPIKey(); // Use Gemini URL
+        String URL = genAIServicesConfig.getGeminiUrl() + "gemini-1.5-flash:generateContent?key=" + environment.getProperty("GENAIAPIKEY"); // Use Gemini URL
         ResponseEntity<String> response = restTemplate.exchange(URL, HttpMethod.POST, request, String.class); // Use Gemini URL
 
         if (response.getStatusCode().is2xxSuccessful()) {
