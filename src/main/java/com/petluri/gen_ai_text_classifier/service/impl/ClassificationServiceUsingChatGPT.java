@@ -3,6 +3,8 @@ package com.petluri.gen_ai_text_classifier.service.impl;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +30,9 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
 
     private final GenAIServicesConfig genAIServicesConfig;
     private final RestTemplate restTemplate;
+
+    @Autowired
+    private Environment environment;
 
     public ClassificationServiceUsingChatGPT(GenAIServicesConfig genAIServicesConfig) {
         this.genAIServicesConfig = genAIServicesConfig;
@@ -76,7 +81,7 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
 
     private JSONObject getRequestBody(String prompt, ClassificationRequest classificationRequest) throws JSONException {
         JSONObject requestBody = new JSONObject();
-        requestBody.put("model", classificationRequest.getGenAIModel());
+        requestBody.put("model", "omni-moderation-latest");
         System.out.println("Prompt: " + prompt);
         requestBody.put("messages", Collections.singletonList(
             new JSONObject().put("role", "user").put("content", prompt)
@@ -88,7 +93,7 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
     private HttpHeaders getHeaders(ClassificationRequest classificationRequest) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(classificationRequest.getGenAIAPIKey());
+        headers.setBearerAuth(environment.getProperty("CHATGPTAPIKEY"));
         return headers;
     }
     

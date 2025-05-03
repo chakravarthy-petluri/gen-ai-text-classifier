@@ -22,16 +22,34 @@ public class ClassifiersController {
         this.genAITypeSelector = genAITypeSelector;
     }
 
-    @PostMapping("/classify")
-    public ResponseEntity<?> classify(@RequestBody ClassificationRequest classificationRequest) {
+    @PostMapping("/classify-chatgpt")
+    public ResponseEntity<?> classifyChatgpt(@RequestBody ClassificationRequest classificationRequest) {
 
         try {
             return new ResponseEntity<>(
                 genAITypeSelector
-                .getService(classificationRequest.getGenAIType())
+                .getService("chatgpt")
                 .classify(classificationRequest), 
                 HttpStatus.OK
                 );
+        } catch (IllegalArgumentException e) { // Catch invalid model names
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            System.err.println("Error during classification: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/classify-gemini")
+    public ResponseEntity<?> classifyGemini(@RequestBody ClassificationRequest classificationRequest) {
+
+        try {
+            return new ResponseEntity<>(
+                    genAITypeSelector
+                            .getService("gemini")
+                            .classify(classificationRequest),
+                    HttpStatus.OK
+            );
         } catch (IllegalArgumentException e) { // Catch invalid model names
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
