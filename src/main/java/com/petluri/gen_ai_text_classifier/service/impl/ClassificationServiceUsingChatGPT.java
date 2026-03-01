@@ -1,5 +1,6 @@
 package com.petluri.gen_ai_text_classifier.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
 
     private List<Classification> parseResponse(String response, List<String> textToClassifyList) {
 
-        List<Classification> classifications = Collections.emptyList();
+        List<Classification> classifications = new ArrayList<>();
 
         String[] responses = response.split("\n");
         for (int i = 0; i < responses.length; i++) {
