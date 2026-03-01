@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.petluri.gen_ai_text_classifier.model.Classification;
 import com.petluri.gen_ai_text_classifier.model.ClassificationRequest;
 import com.petluri.gen_ai_text_classifier.service.ClassificationService;
 
