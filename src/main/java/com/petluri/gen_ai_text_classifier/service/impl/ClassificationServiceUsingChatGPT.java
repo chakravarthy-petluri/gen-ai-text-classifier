@@ -3,12 +3,9 @@ package com.petluri.gen_ai_text_classifier.service.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,18 +18,11 @@ import com.petluri.gen_ai_text_classifier.model.Classification;
 import com.petluri.gen_ai_text_classifier.model.ClassificationRequest;
 import com.petluri.gen_ai_text_classifier.service.ClassificationService;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
-@Qualifier("classificationServiceUsingChatGPTConfig")
 public class ClassificationServiceUsingChatGPT implements ClassificationService {
 
     private final GenAIServicesConfig genAIServicesConfig;
     private final RestTemplate restTemplate;
-
-    @Autowired
-    private Environment environment;
 
     public ClassificationServiceUsingChatGPT(GenAIServicesConfig genAIServicesConfig) {
         this.genAIServicesConfig = genAIServicesConfig;
@@ -81,7 +71,7 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
 
     private JSONObject getRequestBody(String prompt, ClassificationRequest classificationRequest) throws JSONException {
         JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "omni-moderation-latest");
+        requestBody.put("model", classificationRequest.getGenAIModel());
         System.out.println("Prompt: " + prompt);
         requestBody.put("messages", Collections.singletonList(
             new JSONObject().put("role", "user").put("content", prompt)
@@ -93,8 +83,11 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
     private HttpHeaders getHeaders(ClassificationRequest classificationRequest) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(environment.getProperty("CHATGPTAPIKEY"));
+        headers.setBearerAuth(classificationRequest.getGenAIAPIKey());
         return headers;
     }
     
 }
+
+//# chatgpt.api.key=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
+//# chatgpt.api.key=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

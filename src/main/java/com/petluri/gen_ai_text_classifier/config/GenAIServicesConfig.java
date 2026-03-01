@@ -9,12 +9,6 @@ import lombok.Getter;
 @Getter
 public class GenAIServicesConfig {
 
-    @Value("${base.prompt}")
-    private String basePrompt;
-
     @Value("${chatgpt.url}")
     private String chatGPTUrl;
-
-    @Value("${gemini.url}")
-    private String geminiUrl;
 }
