@@ -1,0 +1,22 @@
+# Security configuration for Java runtime
+
+# Disable dangerous protocols
+jdk.tls.disabledAlgorithms=SSLv2Hello, SSLv3, TLSv1, TLSv1.1, \
+    RC4, DES, 3DES_EDE_CBC, DH_anon, ECDH_anon, PSK, SRP, CAMELLIA128, CAMELLIA256, \
+    CECPQ1, CECPQ1-ECDSA, ChaCha20-Poly1305, SHAKE256-114output, SHAKE256-length-reducing
+
+# Disable weak certificate algorithms
+jdk.certpath.disabledAlgorithms=MD2, MD5, SHA1 jdkCA & usage TLSServer, \
+    RSA keySize < 1024, DSA keySize < 1024, EC keySize < 224, SHA1 usage TLSServer
+
+# Secure random number generation
+securerandom.source=file:/dev/urandom
+
+# Disable dangerous reflection
+jdk.reflect.allowGetCallerClass=false
+
+# Limit JNI access
+foreign.restricted=permit
+
+# Enable security manager for reflection access
+java.security.manager=allow

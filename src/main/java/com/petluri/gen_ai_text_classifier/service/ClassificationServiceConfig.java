@@ -1,6 +1,7 @@
 package com.petluri.gen_ai_text_classifier.service;
 
 import com.petluri.gen_ai_text_classifier.service.impl.ClassificationServiceUsingGemini;
+import com.petluri.gen_ai_text_classifier.service.impl.ClassificationServiceUsingClaude;
 import com.petluri.gen_ai_text_classifier.config.GenAIServicesConfig;
 import com.petluri.gen_ai_text_classifier.service.impl.ClassificationServiceUsingChatGPT;
 
@@ -27,5 +28,11 @@ public class ClassificationServiceConfig {
     @Qualifier("classificationServiceUsingChatGPT")
     public ClassificationService classificationServiceUsingChatGPT() {
         return new ClassificationServiceUsingChatGPT(genAIServicesConfig);
+    }
+
+    @Bean
+    @Qualifier("classificationServiceUsingClaude")
+    public ClassificationService classificationServiceUsingClaude() {
+        return new ClassificationServiceUsingClaude(genAIServicesConfig);
     }
 }

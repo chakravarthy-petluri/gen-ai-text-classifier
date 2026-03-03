@@ -13,12 +13,13 @@ public class GenAITypeSelector {
     private final Map<String, ClassificationService> services = new HashMap<>();
 
     public GenAITypeSelector(@Qualifier("classificationServiceUsingGemini") ClassificationService geminiService,
-                         @Qualifier("classificationServiceUsingChatGPT") ClassificationService chatGPTService) {
+                         @Qualifier("classificationServiceUsingChatGPT") ClassificationService chatGPTService,
+                         @Qualifier("classificationServiceUsingClaude") ClassificationService claudeService) {
         services.put("gemini", geminiService);
         services.put("chatgpt", chatGPTService);
+        services.put("claude", claudeService);
         // Add more models here as needed:
         // services.put("llama", llamaService); // Example
-        // services.put("claude", claudeService); // Example
     }
 
     public ClassificationService getService(String typeName) {

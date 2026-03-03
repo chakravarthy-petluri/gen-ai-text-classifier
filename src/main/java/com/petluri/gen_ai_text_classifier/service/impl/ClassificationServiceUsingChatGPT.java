@@ -11,15 +11,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.petluri.gen_ai_text_classifier.config.GenAIServicesConfig;
 import com.petluri.gen_ai_text_classifier.model.Classification;
 import com.petluri.gen_ai_text_classifier.model.ClassificationRequest;
 import com.petluri.gen_ai_text_classifier.service.ClassificationService;
+import com.petluri.gen_ai_text_classifier.util.GenAIResponseParser;
 
-@Service
 public class ClassificationServiceUsingChatGPT implements ClassificationService {
 
     private final GenAIServicesConfig genAIServicesConfig;
@@ -41,17 +40,7 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
     }
 
     private List<Classification> parseResponse(String response, List<String> textToClassifyList) {
-
-        List<Classification> classifications = new ArrayList<>();
-
-        String[] responses = response.split("\n");
-        for (int i = 0; i < responses.length; i++) {
-            Classification classification = new Classification();
-            classification.setTextToClassify(textToClassifyList.get(i));
-            classification.setAttribute(responses[i]);
-            classifications.add(classification);
-        }
-        return classifications;
+        return GenAIResponseParser.parseJsonResponse(response);
     }
         
     private String getPrompt(ClassificationRequest classificationRequest) {
@@ -59,6 +48,7 @@ public class ClassificationServiceUsingChatGPT implements ClassificationService 
         for (int i = 0; i < classificationRequest.getTextToClassifyList().size(); i++) {
             prompt.append(i + 1).append(". ").append(classificationRequest.getTextToClassifyList().get(i)).append("\n");
         }
+        prompt.append("\n\nIMPORTANT: Return ONLY a valid JSON array (no markdown, no extra text). Each object must have 'textToClassify' (the original text) and 'attribute' (one of the classification attributes) fields. Example: [{\"textToClassify\": \"text1\", \"attribute\": \"attr1\"}, {\"textToClassify\": \"text2\", \"attribute\": \"attr2\"}]");
         return prompt.toString();
     }
 
