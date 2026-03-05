@@ -1,0 +1,79 @@
+# Helm values for AWS Elastic Kubernetes Service (EKS)
+# Usage: helm install genai-classifier helm/genai-classifier/ -f helm/values-aws.yaml
+
+image:
+  registry: YOUR_ACCOUNT.dkr.ecr.us-east-1.amazonaws.com
+  repository: genai-text-classifier
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+
+replicaCount: 3
+
+app:
+  name: genai-text-classifier
+  port: 8080
+  springProfilesActive: prod
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: alb  # AWS ALB Ingress Controller
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/load-balancer-name: genai-classifier-alb
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:ACCOUNT:certificate/CERT_ID
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+  hosts:
+    - host: genai-classifier.aws.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+  tls:
+    enabled: true
+    secretName: genai-classifier-tls
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector:
+  # Target specific node group
+  # node.kubernetes.io/instance-type: t3.medium
+
+tolerations: []
+
+secrets:
+  create: false
+  geminiApiKey: ""
+  openaiApiKey: ""
+
+configMap:
+  create: true
+  data:
+    spring.profiles.active: "prod"
+    spring.application.name: "genai-text-classifier"
+
+# AWS specific configuration (if using IRSA - IAM Roles for Service Accounts)
+serviceAccount:
+  create: true
+  name: genai-text-classifier
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/genai-text-classifier-role

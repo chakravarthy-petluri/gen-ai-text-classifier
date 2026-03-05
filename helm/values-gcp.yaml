@@ -1,0 +1,75 @@
+# Helm values for Google Cloud Kubernetes Engine (GKE)
+# Usage: helm install genai-classifier helm/genai-classifier/ -f helm/values-gcp.yaml
+
+image:
+  registry: us-central1-docker.pkg.dev/YOUR_PROJECT_ID/genai-repo
+  repository: genai-text-classifier
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+
+replicaCount: 3
+
+app:
+  name: genai-text-classifier
+  port: 8080
+  springProfilesActive: prod
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: gce  # GCP Cloud Load Balancer
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "genai-classifier-ip"
+    networking.gke.io/managed-certificates: "genai-classifier-cert"
+    kubernetes.io/ingress.allow-http: "false"
+  hosts:
+    - host: genai-classifier.gcp.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+  tls:
+    enabled: true
+    secretName: genai-classifier-tls
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector:
+  # Target specific node pool
+  # cloud.google.com/gke-nodepool: "default-pool"
+
+tolerations: []
+
+secrets:
+  create: false
+  geminiApiKey: ""
+  openaiApiKey: ""
+
+configMap:
+  create: true
+  data:
+    spring.profiles.active: "prod"
+    spring.application.name: "genai-text-classifier"
+
+# GCP specific - Workload Identity
+serviceAccount:
+  create: true
+  name: genai-text-classifier
+  annotations:
+    iam.gke.io/gcp-service-account: genai-classifier@YOUR_PROJECT_ID.iam.gserviceaccount.com

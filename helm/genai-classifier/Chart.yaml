@@ -1,0 +1,15 @@
+apiVersion: v2
+name: genai-text-classifier
+description: A Helm chart for deploying GenAI Text Classifier on Kubernetes
+type: application
+version: 1.0.0
+appVersion: "0.0.1"
+keywords:
+  - genai
+  - text-classification
+  - spring-boot
+  - kubernetes
+home: https://github.com/yourusername/genai-text-classifier
+maintainers:
+  - name: Your Name
+    email: your.email@example.com

@@ -1,0 +1,157 @@
+# Default values for genai-text-classifier Helm chart
+# This is a YAML-formatted file for Helm templating across different cloud providers
+
+# Image configuration
+image:
+  # Multi-cloud compatible registry configuration
+  # Override with: helm install ... --set image.registry=YOUR_REGISTRY
+  registry: ""  # Leave empty for Docker Hub, or specify cloud registry
+  repository: genai-text-classifier
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Replica configuration
+replicaCount: 3
+
+# Service Account
+serviceAccount:
+  create: true
+  name: genai-text-classifier
+
+# Deployment strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+# Application configuration
+app:
+  name: genai-text-classifier
+  port: 8080
+  springProfilesActive: prod
+
+# Resource limits and requests
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Probes configuration
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 15
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx  # Change based on your cloud: "nginx", "gce", "alb", "azure"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+  hosts:
+    - host: genai-classifier.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+  tls:
+    enabled: true
+    secretName: genai-classifier-tls
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container security context
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 65532
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Pod affinity configuration
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - genai-text-classifier
+          topologyKey: kubernetes.io/hostname
+
+# Environment variables
+env:
+  SPRING_PROFILES_ACTIVE: prod
+  JAVA_TOOL_OPTIONS: "-XX:+UseG1GC -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
+
+# Secrets configuration
+secrets:
+  create: false  # Set to true and provide values during install
+  geminiApiKey: ""
+  openaiApiKey: ""
+
+# ConfigMap configuration
+configMap:
+  create: true
+  data:
+    spring.profiles.active: "prod"
+    spring.application.name: "genai-text-classifier"
+
+# Health check endpoints
+healthCheck:
+  livenessPath: /actuator/health/liveness
+  readinessPath: /actuator/health/readiness
+
+# Termination grace period
+terminationGracePeriodSeconds: 30
+
+# Autoscaling (optional)
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# NodeSelector (optional, for specific node pools)
+nodeSelector: {}
+  # cloud.google.com/gke-nodepool: default-pool  # GCP example
+  # node.kubernetes.io/instance-type: t3.medium   # AWS example
+
+# Tolerations (optional, for node taints)
+tolerations: []
+  # - key: "dedicated"
+  #   operator: "Equal"
+  #   value: "batch"
+  #   effect: "NoSchedule"

@@ -1,0 +1,76 @@
+# Helm values for Azure Kubernetes Service (AKS)
+# Usage: helm install genai-classifier helm/genai-classifier/ -f helm/values-azure.yaml
+
+image:
+  registry: YOUR_REGISTRY.azurecr.io
+  repository: genai-text-classifier
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+
+replicaCount: 3
+
+app:
+  name: genai-text-classifier
+  port: 8080
+  springProfilesActive: prod
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: azure/application-gateway  # Azure Application Gateway
+  annotations:
+    cert.certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/backend-protocol: "http"
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/"
+  hosts:
+    - host: genai-classifier.azure.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+  tls:
+    enabled: true
+    secretName: genai-classifier-tls
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector:
+  # Target specific node pool
+  # agentpool: nodepool1
+
+tolerations: []
+
+secrets:
+  create: false
+  geminiApiKey: ""
+  openaiApiKey: ""
+
+configMap:
+  create: true
+  data:
+    spring.profiles.active: "prod"
+    spring.application.name: "genai-text-classifier"
+
+# Azure specific - Managed Identity
+serviceAccount:
+  create: true
+  name: genai-text-classifier
+  annotations:
+    azure.workload.identity/client-id: "CLIENT_ID"
+    azure.workload.identity/tenant-id: "TENANT_ID"
