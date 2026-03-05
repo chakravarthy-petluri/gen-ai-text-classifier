@@ -4,7 +4,7 @@ Your GenAI Text Classifier application is now ready for Oracle Cloud OKE deploym
 
 ## What's Been Created
 
-### 1. **Kubernetes Manifests** (`k8s/`)
+### 1. **Kubernetes Manifests** (`gen-ai-text-classifier/k8s/`)
 Cloud-agnostic YAML manifests that work across all Kubernetes distributions:
 
 - ✅ `deployment.yaml` - Complete deployment with Service, ServiceAccount, RBAC
@@ -14,7 +14,7 @@ Cloud-agnostic YAML manifests that work across all Kubernetes distributions:
 - ✅ `README.md` - Quick start guide
 - ✅ `DEPLOYMENT_GUIDE.md` - Comprehensive cloud-specific deployment guide
 
-### 2. **Helm Charts** (`helm/`)
+### 2. **Helm Charts** (`gen-ai-text-classifier/helm/`)
 Templated deployments with cloud-specific values files:
 
 - ✅ `genai-classifier/Chart.yaml` - Helm chart metadata
@@ -30,7 +30,7 @@ Templated deployments with cloud-specific values files:
 - ✅ Oracle Cloud values file:
   - `values-oracle.yaml` - Oracle Cloud OKE configuration
 
-### 3. **Deployment Automation** (`scripts/`)
+### 3. **Deployment Automation** (`gen-ai-text-classifier/scripts/`)
 Easy-to-use deployment script:
 
 - ✅ `deploy.sh` - Universal deployment script supporting all clouds
@@ -67,15 +67,15 @@ Two deployment options:
 
 **Option 1: Raw kubectl (simplest)**
 ```bash
-kubectl -n genai-app apply -f k8s/
+kubectl -n genai-app apply -f gen-ai-text-classifier/k8s/
 ```
 
 **Option 2: Helm (recommended)**
 ```bash
-helm install genai-classifier helm/genai-classifier/ \
+helm install genai-classifier gen-ai-text-classifier/helm/genai-classifier/ \
   -n genai-app \
   --create-namespace \
-  -f helm/values-oracle.yaml
+  -f gen-ai-text-classifier/helm/values-oracle.yaml
 ```
 
 ---
@@ -98,7 +98,7 @@ docker push iad.ocir.io/YOUR_TENANCY/YOUR_REPO/genai-text-classifier:v1.0.0
 Update the Helm values file for your cloud with the correct registry:
 
 ```yaml
-# helm/values-oracle.yaml
+# gen-ai-text-classifier/helm/values-oracle.yaml
 image:
   registry: iad.ocir.io/YOUR_TENANCY/YOUR_REPOSITORY
   repository: genai-text-classifier
@@ -145,10 +145,10 @@ docker tag genai-text-classifier:v1.0.0 iad.ocir.io/TENANCY/REPO/genai-text-clas
 docker push iad.ocir.io/TENANCY/REPO/genai-text-classifier:v1.0.0
 
 # Deploy
-helm install genai-classifier helm/genai-classifier/ \
+helm install genai-classifier gen-ai-text-classifier/helm/genai-classifier/ \
   -n genai-app \
   --create-namespace \
-  -f helm/values-oracle.yaml
+  -f gen-ai-text-classifier/helm/values-oracle.yaml
 ```
 
 ---
@@ -186,34 +186,33 @@ curl http://localhost:8080/api/classifiers/classify \
 
 ```
 GenAITextClassifierBackend/
-├── k8s/                                    # Kubernetes manifests
-│   ├── README.md                          # Quick start guide
-│   ├── DEPLOYMENT_GUIDE.md                # Detailed cloud guides
-│   ├── deployment.yaml                    # Main deployment
-│   ├── configmap.yaml                     # Config
-│   ├── secrets.example.yaml               # Secrets template
-│   └── ingress.yaml                       # Ingress config
-│
-├── helm/                                  # Helm charts
-│   ├── genai-classifier/                  # Helm chart
-│   │   ├── Chart.yaml
-│   │   ├── values.yaml
-│   │   ├── templates/
-│   │   │   ├── deployment.yaml
-│   │   │   ├── service.yaml
-│   │   │   ├── configmap.yaml
-│   │   │   ├── secrets.yaml
-│   │   │   ├── serviceaccount.yaml
-│   │   │   ├── ingress.yaml
-│   │   │   └── _helpers.tpl
-│   └── values-oracle.yaml                 # Oracle OKE configuration
-│
-├── scripts/
-│   └── deploy.sh                          # Universal deployment script
-│
 ├── gen-ai-text-classifier/                # Your application
 │   ├── Dockerfile                         # Already exists
 │   ├── pom.xml
+│   ├── k8s/                               # Kubernetes manifests
+│   │   ├── README.md                      # Quick start guide
+│   │   ├── DEPLOYMENT_GUIDE.md            # Detailed cloud guides
+│   │   ├── deployment.yaml                # Main deployment
+│   │   ├── configmap.yaml                 # Config
+│   │   ├── secrets.example.yaml           # Secrets template
+│   │   └── ingress.yaml                   # Ingress config
+│   │
+│   ├── helm/                              # Helm charts
+│   │   ├── genai-classifier/              # Helm chart
+│   │   │   ├── Chart.yaml
+│   │   │   ├── values.yaml
+│   │   │   ├── templates/
+│   │   │   │   ├── deployment.yaml
+│   │   │   │   ├── service.yaml
+│   │   │   │   ├── configmap.yaml
+│   │   │   │   ├── secrets.yaml
+│   │   │   │   ├── serviceaccount.yaml
+│   │   │   │   ├── ingress.yaml
+│   │   │   │   └── _helpers.tpl
+│   │   └── values-oracle.yaml             # Oracle OKE configuration
+│   │
+│   ├── scripts/
+│   │   └── deploy.sh                      # Universal deployment script
 │   └── ...
 │
 └── KUBERNETES_DEPLOYMENT_SUMMARY.md       # This file
@@ -262,9 +261,9 @@ helm upgrade genai-classifier helm/genai-classifier/ \
 
 ## Documentation References
 
-- **Quick Start**: See `k8s/README.md`
-- **Detailed Guide**: See `k8s/DEPLOYMENT_GUIDE.md`
-- **Helm Values**: See `helm/values-oracle.yaml`
+- **Quick Start**: See `gen-ai-text-classifier/k8s/README.md`
+- **Detailed Guide**: See `gen-ai-text-classifier/k8s/DEPLOYMENT_GUIDE.md`
+- **Helm Values**: See `gen-ai-text-classifier/helm/values-oracle.yaml`
 - **Official Docs**:
   - Kubernetes: https://kubernetes.io/docs/
   - Helm: https://helm.sh/docs/
@@ -282,7 +281,7 @@ helm upgrade genai-classifier helm/genai-classifier/ \
 4. Pod logs: `kubectl logs -f -n genai-app <POD_NAME>`
 5. Events: `kubectl get events -n genai-app --sort-by='.lastTimestamp'`
 
-**Questions?** See the comprehensive `k8s/DEPLOYMENT_GUIDE.md` for cloud-specific instructions.
+**Questions?** See the comprehensive `gen-ai-text-classifier/k8s/DEPLOYMENT_GUIDE.md` for cloud-specific instructions.
 
 ---
 

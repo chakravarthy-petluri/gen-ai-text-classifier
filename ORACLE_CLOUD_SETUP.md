@@ -382,7 +382,7 @@ docker push <REGION>.ocir.io/<TENANCY>/genai-text-classifier:v1.0.0
 
 ```bash
 # Edit the values file
-nano helm/values-oracle.yaml
+nano gen-ai-text-classifier/helm/values-oracle.yaml
 
 # Update the registry line:
 # registry: <REGION>.ocir.io/<TENANCY>/genai-repo
@@ -398,10 +398,10 @@ nano helm/values-oracle.yaml
 cd GenAITextClassifierBackend
 
 # Make sure script is executable
-chmod +x scripts/deploy.sh
+chmod +x gen-ai-text-classifier/scripts/deploy.sh
 
 # Deploy!
-./scripts/deploy.sh oracle
+./gen-ai-text-classifier/scripts/deploy.sh oracle
 
 # The script will:
 # ✓ Check prerequisites
@@ -509,7 +509,7 @@ kubectl top nodes
 4. **Setup Logging** (centralized logs)
 5. **Configure Auto-scaling** (HPA)
 
-See `k8s/DEPLOYMENT_GUIDE.md` for advanced topics.
+See `gen-ai-text-classifier/k8s/DEPLOYMENT_GUIDE.md` for advanced topics.
 
 ---
 
@@ -559,7 +559,7 @@ kubectl delete namespace genai-app
 ## Still Need Help?
 
 Check:
-1. `k8s/README.md` - Kubernetes quick start
-2. `k8s/DEPLOYMENT_GUIDE.md` - Detailed deployment guide
+1. `gen-ai-text-classifier/k8s/README.md` - Kubernetes quick start
+2. `gen-ai-text-classifier/k8s/DEPLOYMENT_GUIDE.md` - Detailed deployment guide
 3. `KUBERNETES_DEPLOYMENT_SUMMARY.md` - Complete overview
 4. Oracle Cloud support: https://www.oracle.com/cloud/support/

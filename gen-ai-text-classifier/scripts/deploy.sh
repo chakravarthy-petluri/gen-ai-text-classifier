@@ -166,7 +166,7 @@ print_next_steps() {
     echo "4. View deployment:"
     echo "   kubectl get all -n $NAMESPACE"
     echo ""
-    echo "For more information, see k8s/DEPLOYMENT_GUIDE.md"
+    echo "For more information, see ../k8s/DEPLOYMENT_GUIDE.md"
 }
 
 # Parse command line arguments
