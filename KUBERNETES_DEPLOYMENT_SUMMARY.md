@@ -1,6 +1,6 @@
-# Kubernetes Deployment Setup - Summary
+# Oracle Kubernetes Deployment - Summary
 
-Your GenAI Text Classifier application is now ready for multi-cloud Kubernetes deployment!
+Your GenAI Text Classifier application is now ready for Oracle Cloud OKE deployment!
 
 ## What's Been Created
 
@@ -27,11 +27,8 @@ Templated deployments with cloud-specific values files:
   - serviceaccount.yaml
   - ingress.yaml
   - _helpers.tpl
-- ✅ Cloud-specific values files:
+- ✅ Oracle Cloud values file:
   - `values-oracle.yaml` - Oracle Cloud OKE configuration
-  - `values-aws.yaml` - AWS EKS configuration
-  - `values-gcp.yaml` - Google Cloud GKE configuration
-  - `values-azure.yaml` - Azure AKS configuration
 
 ### 3. **Deployment Automation** (`scripts/`)
 Easy-to-use deployment script:
@@ -42,13 +39,10 @@ Easy-to-use deployment script:
 
 ## Key Features
 
-### ✅ Multi-Cloud Compatible
+### ✅ Oracle Cloud Kubernetes (OKE) Compatible
 Deploy to:
 - **Oracle Cloud** (OKE) - uses OCIR registry
-- **AWS** (EKS) - uses ECR registry with ALB ingress
-- **Google Cloud** (GKE) - uses Artifact Registry with GCE ingress
-- **Azure** (AKS) - uses ACR registry with Application Gateway
-- **Any standard Kubernetes cluster** - distroless, security-hardened Java 21 image
+- Standards-compliant, security-hardened Java 21 image
 
 ### ✅ Security Hardened
 - Non-root user (UID 65532) - distroless image default
@@ -69,7 +63,7 @@ Deploy to:
 - Network policy ready
 
 ### ✅ Easy to Deploy
-Three deployment options:
+Two deployment options:
 
 **Option 1: Raw kubectl (simplest)**
 ```bash
@@ -81,15 +75,7 @@ kubectl -n genai-app apply -f k8s/
 helm install genai-classifier helm/genai-classifier/ \
   -n genai-app \
   --create-namespace \
-  -f helm/values-oracle.yaml  # or values-aws.yaml, etc.
-```
-
-**Option 3: Automated script (easiest)**
-```bash
-./scripts/deploy.sh oracle     # Deploy to Oracle Cloud
-./scripts/deploy.sh aws        # Deploy to AWS
-./scripts/deploy.sh gcp        # Deploy to GCP
-./scripts/deploy.sh azure      # Deploy to Azure
+  -f helm/values-oracle.yaml
 ```
 
 ---
@@ -104,18 +90,8 @@ Build and push your Docker image to your cloud registry:
 cd gen-ai-text-classifier
 docker build -t genai-text-classifier:v1.0.0 .
 
-# Push to your cloud registry (examples below)
-# Oracle Cloud:
+# Push to Oracle Cloud Registry (OCIR)
 docker push iad.ocir.io/YOUR_TENANCY/YOUR_REPO/genai-text-classifier:v1.0.0
-
-# AWS:
-docker push YOUR_ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/genai-text-classifier:v1.0.0
-
-# GCP:
-docker push us-central1-docker.pkg.dev/PROJECT_ID/REPO/genai-text-classifier:v1.0.0
-
-# Azure:
-docker push YOUR_REGISTRY.azurecr.io/genai-text-classifier:v1.0.0
 ```
 
 ### 2. Configure Your Cloud Registry
@@ -158,7 +134,7 @@ ingress:
 
 ---
 
-## Quick Start Examples
+## Quick Start Example
 
 ### Deploy to Oracle Cloud OKE
 
@@ -173,42 +149,6 @@ helm install genai-classifier helm/genai-classifier/ \
   -n genai-app \
   --create-namespace \
   -f helm/values-oracle.yaml
-```
-
-### Deploy to AWS EKS
-
-```bash
-# Prerequisites
-aws eks update-kubeconfig --name genai-cluster
-docker tag genai-text-classifier:v1.0.0 ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/genai-text-classifier:v1.0.0
-docker push ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/genai-text-classifier:v1.0.0
-
-# Deploy
-./scripts/deploy.sh aws -n production
-```
-
-### Deploy to Google Cloud GKE
-
-```bash
-# Prerequisites
-gcloud container clusters get-credentials genai-cluster --zone us-central1-a
-docker tag genai-text-classifier:v1.0.0 us-central1-docker.pkg.dev/PROJECT/REPO/genai-text-classifier:v1.0.0
-docker push us-central1-docker.pkg.dev/PROJECT/REPO/genai-text-classifier:v1.0.0
-
-# Deploy
-./scripts/deploy.sh gcp
-```
-
-### Deploy to Azure AKS
-
-```bash
-# Prerequisites
-az aks get-credentials --name genai-cluster --resource-group myGroup
-docker tag genai-text-classifier:v1.0.0 REGISTRY.azurecr.io/genai-text-classifier:v1.0.0
-docker push REGISTRY.azurecr.io/genai-text-classifier:v1.0.0
-
-# Deploy
-./scripts/deploy.sh azure
 ```
 
 ---
@@ -266,10 +206,7 @@ GenAITextClassifierBackend/
 │   │   │   ├── serviceaccount.yaml
 │   │   │   ├── ingress.yaml
 │   │   │   └── _helpers.tpl
-│   ├── values-oracle.yaml                 # Oracle OKE values
-│   ├── values-aws.yaml                    # AWS EKS values
-│   ├── values-gcp.yaml                    # GCP GKE values
-│   └── values-azure.yaml                  # Azure AKS values
+│   └── values-oracle.yaml                 # Oracle OKE configuration
 │
 ├── scripts/
 │   └── deploy.sh                          # Universal deployment script
@@ -326,15 +263,13 @@ helm upgrade genai-classifier helm/genai-classifier/ \
 ## Documentation References
 
 - **Quick Start**: See `k8s/README.md`
-- **Detailed Guides**: See `k8s/DEPLOYMENT_GUIDE.md`
-- **Helm Values**: See `helm/values-*.yaml` files
+- **Detailed Guide**: See `k8s/DEPLOYMENT_GUIDE.md`
+- **Helm Values**: See `helm/values-oracle.yaml`
 - **Official Docs**:
   - Kubernetes: https://kubernetes.io/docs/
   - Helm: https://helm.sh/docs/
   - Oracle OKE: https://docs.oracle.com/en-us/iaas/Content/ContEng/home.htm
-  - AWS EKS: https://docs.aws.amazon.com/eks/
-  - GCP GKE: https://cloud.google.com/kubernetes-engine/docs
-  - Azure AKS: https://learn.microsoft.com/en-us/azure/aks/
+  - Oracle Cloud Setup: See `ORACLE_CLOUD_SETUP.md`
 
 ---
 
@@ -353,12 +288,12 @@ helm upgrade genai-classifier helm/genai-classifier/ \
 
 ## Summary
 
-✅ **Your GenAI Text Classifier is now Kubernetes-ready!**
+✅ **Your GenAI Text Classifier is ready for Oracle Cloud OKE deployment!**
 
-- Multi-cloud compatible deployment files
-- Security-hardened configuration
-- Production-ready with autoscaling and monitoring
-- Easy deployment with Helm or automation scripts
-- Comprehensive documentation for each cloud provider
+- Oracle Cloud OKE-optimized deployment configuration
+- Security-hardened, production-ready setup
+- Autoscaling and monitoring support
+- Easy deployment with Helm or kubectl
+- Comprehensive Oracle Cloud documentation
 
-Ready to deploy? Choose your cloud and follow the quick start examples above!
+Ready to deploy? Follow the quick start example and ORACLE_CLOUD_SETUP.md guide!

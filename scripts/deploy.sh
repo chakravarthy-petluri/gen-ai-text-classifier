@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Multi-Cloud Kubernetes Deployment Script for GenAI Text Classifier
-# Usage: ./deploy.sh [oracle|aws|gcp|azure] [options]
+# Oracle Cloud Kubernetes Deployment Script for GenAI Text Classifier
+# Usage: ./deploy.sh [options]
 
 set -e
 
@@ -13,16 +13,18 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Default values
-CLOUD_PROVIDER=${1:-}
+CLOUD_PROVIDER="oracle"
 NAMESPACE=${NAMESPACE:-genai-app}
 RELEASE_NAME=${RELEASE_NAME:-genai-classifier}
 HELM_CHART_PATH="helm/genai-classifier"
-VALUES_FILE=""
+VALUES_FILE="helm/values-oracle.yaml"
 DRY_RUN=${DRY_RUN:-false}
 
 # Functions
 print_usage() {
-    echo "Usage: $0 [oracle|aws|gcp|azure] [options]"
+    echo "Usage: $0 [options]"
+    echo ""
+    echo "Deploys GenAI Text Classifier to Oracle Cloud OKE"
     echo ""
     echo "Options:"
     echo "  -n, --namespace NAMESPACE      Kubernetes namespace (default: genai-app)"
@@ -31,10 +33,9 @@ print_usage() {
     echo "  --help                         Show this help message"
     echo ""
     echo "Examples:"
-    echo "  ./deploy.sh oracle                              # Deploy to Oracle Cloud OKE"
-    echo "  ./deploy.sh aws -n production                   # Deploy to AWS EKS in production namespace"
-    echo "  ./deploy.sh gcp --dry-run                       # Preview deployment to GCP GKE"
-    echo "  ./deploy.sh azure -r my-release                 # Deploy to Azure AKS with custom release name"
+    echo "  ./deploy.sh                              # Deploy to Oracle Cloud OKE"
+    echo "  ./deploy.sh -n production                # Deploy to production namespace"
+    echo "  ./deploy.sh --dry-run                    # Preview deployment"
 }
 
 log_info() {
@@ -75,62 +76,16 @@ check_prerequisites() {
     fi
     log_info "✓ Connected to Kubernetes cluster"
 
-    # Check cloud CLI tools
-    case $CLOUD_PROVIDER in
-        oracle)
-            if ! command -v oci &> /dev/null; then
-                log_warn "OCI CLI not found (optional, but recommended)"
-            else
-                log_info "✓ OCI CLI found"
-            fi
-            ;;
-        aws)
-            if ! command -v aws &> /dev/null; then
-                log_warn "AWS CLI not found (optional, but recommended)"
-            else
-                log_info "✓ AWS CLI found"
-            fi
-            ;;
-        gcp)
-            if ! command -v gcloud &> /dev/null; then
-                log_warn "Google Cloud CLI not found (optional, but recommended)"
-            else
-                log_info "✓ Google Cloud CLI found"
-            fi
-            ;;
-        azure)
-            if ! command -v az &> /dev/null; then
-                log_warn "Azure CLI not found (optional, but recommended)"
-            else
-                log_info "✓ Azure CLI found"
-            fi
-            ;;
-    esac
+    # Check OCI CLI
+    if ! command -v oci &> /dev/null; then
+        log_warn "OCI CLI not found (optional, but recommended)"
+    else
+        log_info "✓ OCI CLI found"
+    fi
 }
 
-select_values_file() {
-    case $CLOUD_PROVIDER in
-        oracle)
-            VALUES_FILE="helm/values-oracle.yaml"
-            log_info "Using Oracle Cloud (OKE) configuration"
-            ;;
-        aws)
-            VALUES_FILE="helm/values-aws.yaml"
-            log_info "Using AWS (EKS) configuration"
-            ;;
-        gcp)
-            VALUES_FILE="helm/values-gcp.yaml"
-            log_info "Using Google Cloud (GKE) configuration"
-            ;;
-        azure)
-            VALUES_FILE="helm/values-azure.yaml"
-            log_info "Using Azure (AKS) configuration"
-            ;;
-        *)
-            log_error "Invalid cloud provider: $CLOUD_PROVIDER"
-            ;;
-    esac
-
+verify_values_file() {
+    log_info "Using Oracle Cloud (OKE) configuration"
     if [[ ! -f "$VALUES_FILE" ]]; then
         log_error "Values file not found: $VALUES_FILE"
     fi
@@ -234,24 +189,19 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         *)
-            CLOUD_PROVIDER="$1"
-            shift
+            log_error "Unknown option: $1"
+            print_usage
+            exit 1
             ;;
     esac
 done
 
-# Validate inputs
-if [[ -z "$CLOUD_PROVIDER" ]]; then
-    log_error "Cloud provider not specified"
-    print_usage
-fi
-
 # Main execution
-log_info "Starting deployment for $CLOUD_PROVIDER..."
+log_info "Starting deployment to Oracle Cloud OKE..."
 echo ""
 
 check_prerequisites
-select_values_file
+verify_values_file
 create_namespace
 deploy_with_helm
 verify_deployment
