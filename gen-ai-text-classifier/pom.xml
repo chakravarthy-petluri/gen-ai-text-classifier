@@ -14,7 +14,7 @@
 	<name>gen-ai-text-classifier</name>
 	<description>GenAI Text Classifier REST API using Gemini and ChatGPT</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 		<tomcat.version>10.1.45</tomcat.version>
 	</properties>
 	<dependencies>
