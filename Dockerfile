@@ -1,13 +1,13 @@
 # Stage 1: Build
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 WORKDIR /usr/src/app
 COPY . ./
 RUN ./mvnw package -DskipTests -q
 
-# Stage 2: Runtime - Use distroless Java 21 (minimal, no shell, no package manager)
+# Stage 2: Runtime - Use distroless Java 17 (minimal, no shell, no package manager)
 # Distroless images contain ONLY the application and runtime dependencies
-FROM gcr.io/distroless/java21-debian12:nonroot
+FROM gcr.io/distroless/java17-debian12:nonroot
 
 # Copy JAR from builder stage
 COPY --from=builder /usr/src/app/target/gen-ai-text-classifier-0.0.1-SNAPSHOT.jar /app/app.jar
